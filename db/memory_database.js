@@ -1,26 +1,24 @@
 // In memory database of key value pairs.
-class MemoryDatabase {
+export default class MemoryDatabase {
   constructor() {
-    this.memory = {};
+    this.memory = new Map();
   }
 
   set(key, val) {
-    this.memory[key] = val;
+    this.memory.set(key, val);
     return true;
   }
 
   get(key) {
-    return this.memory[key];
+    return this.memory.get(key);
   }
 
   incr(key, by = 1) {
-    const val = this.memory[key];
+    const val = this.get(key);
     let num = Number(val);
     if (isNaN(num)) {
       throw new Error(`MemoryDatabase: Failed to convert ${val} to number`);
     }
-    this.memory[key] = num + by;
+    this.set(key, num + by);
   }
 }
-
-module.exports = MemoryDatabase;
