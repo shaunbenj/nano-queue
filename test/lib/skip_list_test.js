@@ -22,11 +22,21 @@ describe("SkipList", () => {
 
     // p is 0 so there should be only level
     assert.strictEqual(skipList.levels.length, 1);
+
     // Verify only 1 element was inserted
     assert.strictEqual(skipList.levels[0].width, 1);
     assert.notEqual(skipList.levels[0].next, null);
     assert.strictEqual(skipList.levels[0].next.next, null);
     assert.strictEqual(skipList.levels[0].next.prev, skipList.levels[0]);
+
+    // Raises an error if multiple elements with the same score are inserted
+    assert.throws(
+      () => {
+        skipList.insert(1);
+      },
+      Error,
+      "Duplicate node found with the same score"
+    );
   });
 
   it("builds levels", () => {
@@ -60,5 +70,49 @@ describe("SkipList", () => {
     const lowerNode = skipList.levels[0].next;
     assert.strictEqual(upperNode.down, lowerNode);
     assert.strictEqual(lowerNode.down, null);
+  });
+
+  it("deletes by score", () => {
+    // Set p to 0 so that the skip list is always one level
+    const skipList = new SkipList(0);
+
+    skipList.insert(1).insert(2).insert(3);
+
+    assert.strictEqual(skipList.delete(0), 0);
+
+    assert.strictEqual(skipList.delete(2), 1);
+
+    assert.strictEqual(skipList.delete(2), 0);
+  });
+
+  it("deletes by range", () => {
+    // Set p to 1 so that it always adds another level
+    const skipList = new SkipList(1);
+
+    skipList.insert(1).insert(2).insert(3);
+
+    // Deleting by a range that contains no elements should not delete anything
+    let numDeleted = skipList.deleteByRange(-Infinity, 0);
+    assert.strictEqual(numDeleted, 0);
+
+    // Deleting 2 should leave 1 and 3 behind
+    numDeleted = skipList.deleteByRange(1.5, 2);
+    assert.strictEqual(numDeleted, 1);
+    assert.strictEqual(skipList.levels[0].width, 2);
+    assert.strictEqual(skipList.levels[0].next.score, 1);
+    assert.strictEqual(skipList.levels[0].next.next.score, 3);
+
+    // Deleting 3 should leave 1 behind
+    numDeleted = skipList.deleteByRange(2.5, 3);
+    assert.strictEqual(numDeleted, 1);
+    assert.strictEqual(skipList.levels[0].width, 1);
+    assert.strictEqual(skipList.levels[0].next.score, 1);
+    assert.strictEqual(skipList.levels[0].next.next, null);
+
+    // Deleting 1 should leave an empty list
+    numDeleted = skipList.deleteByRange(-Infinity, Infinity);
+    assert.strictEqual(numDeleted, 1);
+    assert.strictEqual(skipList.levels[0].width, 0);
+    assert.strictEqual(skipList.levels.length, 1);
   });
 });
