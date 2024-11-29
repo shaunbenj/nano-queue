@@ -1,16 +1,24 @@
 {
-  "name": "nano-cache",
+  "name": "nano-queue",
   "version": "1.0.0",
-  "main": "app/app.js",
+  "main": "app/services/queue/index.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
-    "start": "nodemon app/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "mem_db": "nodemon app/services/memory_database/index.js",
+    "queue": "nodemon app/services/queue/index.js",
+    "all": "concurrently \"npm run mem_db\" \"npm run queue\"",
+    "test": "mocha --recursive"
   },
   "author": "",
   "license": "ISC",
   "description": "",
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "mocha": "^10.8.2"
+  },
+  "mocha": {
+    "require": "./test/test_setup.js"
+  }
 }

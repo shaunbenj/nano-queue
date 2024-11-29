@@ -1,7 +1,7 @@
-import MemoryDatabase from "../../db/memory_database.js";
-import { errorResponse, jsonResponse } from "../../lib/response_util.js";
+import MemoryDatabase from "./database.js";
+import { errorResponse, jsonResponse } from "../../../lib/response_util.js";
 
-class CacheApi {
+class MemoryDatabaseApi {
   constructor(database = new MemoryDatabase()) {
     this.db = database;
   }
@@ -23,5 +23,5 @@ class CacheApi {
   }
 }
 
-const cacheAPI = new CacheApi();
-export default cacheAPI;
+const memoryDataBaseApi = new MemoryDatabaseApi();
+export default memoryDataBaseApi;
