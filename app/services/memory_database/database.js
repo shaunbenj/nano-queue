@@ -1,4 +1,4 @@
-// In memory database of key value pairs.
+// In memory database of key value pairs
 export default class MemoryDatabase {
   constructor() {
     this.memory = new Map();
