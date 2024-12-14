@@ -30,13 +30,9 @@ describe("SkipList", () => {
     assert.strictEqual(skipList.levels[0].next.prev, skipList.levels[0]);
 
     // Raises an error if multiple elements with the same score are inserted
-    assert.throws(
-      () => {
-        skipList.insert(1);
-      },
-      Error,
-      "Duplicate node found with the same score"
-    );
+    assert.throws(() => {
+      skipList.insert(1);
+    }, new Error("Duplicate node found with the same score"));
   });
 
   it("builds levels", () => {
