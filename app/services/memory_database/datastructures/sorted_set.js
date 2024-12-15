@@ -1,6 +1,6 @@
 import SkipList from "../../../../lib/skip_list.js";
 
-// Sorted set of key value pairs where keys are numeric scores
+// Sorted set of key value pairs where the key acts as a score to sort by
 export default class SortedSet {
   constructor(skipList = new SkipList(), map = new Map()) {
     this.skipList = skipList;
@@ -9,7 +9,7 @@ export default class SortedSet {
 
   // Stores a key value pair
   set(score, val) {
-    if (score.constructor.name != "Number") {
+    if (score.constructor.name != "String") {
       throw new Error(`Score ${score} is not numeric`);
     }
 
