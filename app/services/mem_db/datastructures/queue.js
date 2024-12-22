@@ -17,6 +17,10 @@ export default class Queue {
     this.list.insertHeadBatch(dataArray);
   }
 
+  leftPeek() {
+    return this.list.peekHead();
+  }
+
   leftPop() {
     return this.list.popHead();
   }
@@ -37,11 +41,25 @@ export default class Queue {
     this.list.insertTailBatch(dataArray);
   }
 
+  rightPeek() {
+    return this.list.rightPeek();
+  }
+
   rightPop() {
     return this.list.popTail();
   }
 
   rightBatchPop(n) {
     return this.list.popTailBatch(n);
+  }
+
+  undoCommand(command, inputArgs, returnVal) {
+    if (command == "leftPop") {
+      this.insertHead(returnVal);
+    } else if (command == "leftPush") {
+      this.leftPop();
+    } else {
+      throw new Error(`unsupported undo for ${command}`);
+    }
   }
 }

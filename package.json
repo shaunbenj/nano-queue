@@ -20,5 +20,8 @@
   },
   "mocha": {
     "require": "./test/test_setup.js"
+  },
+  "dependencies": {
+    "wasmoon": "file:../wasmoon-test"
   }
 }

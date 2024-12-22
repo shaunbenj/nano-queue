@@ -1,4 +1,4 @@
-import Queue from "../../../../../app/services/memory_database/datastructures/queue.js";
+import Queue from "../../../../../app/services/mem_db/datastructures/queue.js";
 
 describe("Queue", () => {
   it("creates an ordered queue", () => {
