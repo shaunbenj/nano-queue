@@ -6,7 +6,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "mem_db": "nodemon app/services/memory_database/index.js",
+    "mem_db": "nodemon app/services/mem_db/index.js",
     "queue": "nodemon app/services/queue/index.js",
     "all": "concurrently \"npm run mem_db\" \"npm run queue\"",
     "test": "mocha --recursive"
@@ -20,5 +20,8 @@
   },
   "mocha": {
     "require": "./test/test_setup.js"
+  },
+  "dependencies": {
+    "async-mutex": "^0.5.0"
   }
 }

@@ -1,4 +1,4 @@
-import SortedSet from "../../../../../app/services/memory_database/datastructures/sorted_set.js";
+import SortedSet from "../../../../../app/services/mem_db/datastructures/sorted_set.js";
 
 describe("SortedSet", () => {
   it("sets and gets", () => {
