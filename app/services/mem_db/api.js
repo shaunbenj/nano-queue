@@ -1,8 +1,8 @@
-import MemoryDatabase from "./database.js";
+import MemDb from "./mem_db.js";
 import { errorResponse, jsonResponse } from "../../../lib/response_util.js";
 
-class MemoryDatabaseApi {
-  constructor(database = new MemoryDatabase()) {
+class MemDbApi {
+  constructor(database = new MemDb()) {
     this.db = database;
   }
 
@@ -23,5 +23,5 @@ class MemoryDatabaseApi {
   }
 }
 
-const memoryDataBaseApi = new MemoryDatabaseApi();
-export default memoryDataBaseApi;
+const memDbApi = new MemDbApi();
+export default memDbApi;
