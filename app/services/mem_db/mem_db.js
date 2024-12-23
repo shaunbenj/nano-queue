@@ -37,9 +37,9 @@ export default class MemDb {
         throw new Error(`Name ${name} is already in use`);
       }
 
-      const datastructureClass = this.dsRegistry[type];
+      const dsClass = this.dsRegistry[type];
 
-      this.dsLookup.set(name, new datastructureClass());
+      this.dsLookup.set(name, new dsClass());
     });
   }
 
@@ -52,6 +52,12 @@ export default class MemDb {
       const datastructure = this.dsLookup.get(name);
 
       return datastructure[command](...args);
+    });
+  }
+
+  async delete(name) {
+    return this.mutex.runExclusive(async () => {
+      return this.dsLookup.delete(name);
     });
   }
 }

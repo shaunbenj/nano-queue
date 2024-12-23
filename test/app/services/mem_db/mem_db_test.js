@@ -84,9 +84,23 @@ describe("MemDb", () => {
 
     await Promise.all([slowSet, fastSet]);
 
+    // Without a mutex slowSet API call will overwrite what fastSet wrote. With
+    // a mutex the last write should win.
     assert.strictEqual(
       await memDb.execute("myKeyValue", "get", "myKey"),
       "fastValue"
     );
+  });
+
+  it("deletes", async () => {
+    const memDb = new MemDb();
+
+    await memDb.create("KeyValue", "myMap");
+
+    assert.strictEqual(memDb.dsLookup.get("myMap") instanceof KeyValue, true);
+
+    await memDb.delete("myMap");
+
+    assert.strictEqual(memDb.dsLookup.get("myMap"), undefined);
   });
 });
