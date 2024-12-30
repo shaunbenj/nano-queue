@@ -1,8 +1,12 @@
+import Command from "../../../../lib/command/command.js";
+import MultiCommand from "../../../../lib/command/multi_command.js";
 import SkipList from "../../../../lib/skip_list.js";
+import Base from "./base.js";
 
 // Sorted set of key value pairs where the key acts as a score to sort by
-export default class SortedSet {
+export default class SortedSet extends Base {
   constructor(skipList = new SkipList(), map = new Map()) {
+    super();
     this.skipList = skipList;
     this.map = map;
   }
@@ -50,5 +54,30 @@ export default class SortedSet {
     });
 
     return scoreValues;
+  }
+
+  undoCommand(operation, ...args) {
+    if (operation == "set") {
+      return new Command(this, "delete", args[0]);
+    } else if (operation == "get" || operation == "getByRange") {
+      return Command.noop();
+    } else if (operation == "delete") {
+      const deletedValue = this.get(args[0]);
+
+      return new Command(this, "set", args[0], deletedValue);
+    } else if (operation == "deleteByRange") {
+      const deletedValues = this.getByRange(args[0], args[1]);
+
+      const commands = [];
+      for (const deletedValue of deletedValues) {
+        commands.push(
+          new Command(this, "set", deletedValue[0], deletedValue[1])
+        );
+      }
+
+      return new MultiCommand(commands);
+    } else {
+      throw new Error(`Unrecognized operation ${operation} for SortedSet`);
+    }
   }
 }

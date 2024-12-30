@@ -68,4 +68,43 @@ describe("SortedSet", () => {
       ["002", "C"],
     ]);
   });
+
+  it("generates undo commands", () => {
+    const sortedSet = new SortedSet();
+
+    sortedSet.set("001", "B").set("000", "A").set("002", "C");
+
+    // Runs an operation and its corresponding undo operation. Verfies that the
+    // undo restores it back to the original state.
+    const runTest = (operation, args) => {
+      const undo = sortedSet.undoCommand(operation, ...args);
+
+      sortedSet[operation](...args);
+
+      undo.execute();
+
+      assert.deepStrictEqual(sortedSet.getByRange("000", "100"), [
+        ["000", "A"],
+        ["001", "B"],
+        ["002", "C"],
+      ]);
+    };
+
+    const tests = [
+      ["set", ["020", "D"]],
+      ["get", ["000"]],
+      ["getByRange", ["000", "100"]],
+      ["delete", ["000"]],
+      ["deleteByRange", ["000", "100"]],
+    ];
+
+    tests.forEach((test) => {
+      runTest(...test);
+    });
+
+    // Raises error for unrecgonized operation
+    assert.throws(() => {
+      sortedSet.undoCommand("invalid", "key");
+    }, new Error("Unrecognized operation invalid for SortedSet"));
+  });
 });

@@ -1,5 +1,9 @@
-export default class KeyValue {
+import Command from "../../../../lib/command/command.js";
+import Base from "./base.js";
+
+export default class KeyValue extends Base {
   constructor(map = new Map()) {
+    super();
     this.map = map;
   }
 
@@ -22,5 +26,17 @@ export default class KeyValue {
     }
 
     return this.set(key, num + by);
+  }
+
+  undoCommand(operation, ...args) {
+    if (operation == "set") {
+      return new Command(this, "set", args[0], this.get(args[0]));
+    } else if (operation == "get") {
+      return Command.noop();
+    } else if (operation == "incr") {
+      return new Command(this, "set", args[0], this.get(args[0]));
+    } else {
+      throw new Error(`Unrecognized operation ${operation} for KeyValue`);
+    }
   }
 }

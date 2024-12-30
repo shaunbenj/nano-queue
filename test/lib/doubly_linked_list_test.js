@@ -4,8 +4,8 @@ describe("DoublyLinkedList", () => {
   it("inserts and pops elements", () => {
     const list = new DoublyLinkedList();
 
-    assert.strictEqual(list.peekHead(), null);
-    assert.strictEqual(list.peekTail(), null);
+    assert.strictEqual(list.peekHead(), undefined);
+    assert.strictEqual(list.peekTail(), undefined);
     assert.strictEqual(list.popHead(), null);
     assert.strictEqual(list.popTail(), null);
 
