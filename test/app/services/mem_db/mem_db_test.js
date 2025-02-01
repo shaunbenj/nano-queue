@@ -27,6 +27,18 @@ describe("MemDb", () => {
 
     memDb.execute("myMap", "set", "myKey", "myValue");
 
+    const proxy2 = new Proxy(memDb, {
+      apply(target, thisArg, argumentsList) {
+        // Ensure the name is always capitalized
+        const modifiedArgs = argumentsList.map((arg) => arg.toUpperCase());
+        console.log(`in proxy 2 ${target} ${thisArg} ${argumentsList}`);
+        return Reflect.apply(target, thisArg, modifiedArgs);
+      },
+    });
+
+    console.log("Aasda");
+    const x = await proxy2.execute("myMap", "set", "a", "b");
+
     assert.strictEqual(await memDb.execute("myMap", "get", "myKey"), "myValue");
 
     // Raises error if datastructure name is missing
