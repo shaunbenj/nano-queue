@@ -22,6 +22,7 @@
     "require": "./test/test_setup.js"
   },
   "dependencies": {
-    "async-mutex": "^0.5.0"
+    "async-mutex": "^0.5.0",
+    "wasmoon": "^1.16.0"
   }
 }
