@@ -1,106 +1,123 @@
 import KeyValue from "../../../../app/services/mem_db/datastructures/key_value.js";
-import MemDb from "../../../../app/services/mem_db/mem_db.js";
+import MemDB from "../../../../app/services/mem_db/mem_db.js";
 
-describe("MemDb", () => {
-  it("creates named datastructures", async () => {
-    const memDb = new MemDb();
+describe("MemDB", () => {
+  it("creates named datastructures", () => {
+    const memDB = new MemDB();
 
-    await memDb.create("KeyValue", "myMap");
+    memDB.create("KeyValue", "myMap");
 
-    assert.strictEqual(memDb.dsLookup.get("myMap") instanceof KeyValue, true);
+    assert.strictEqual(memDB.dsLookup.get("myMap") instanceof KeyValue, true);
 
     // Raises error if name is already in use
     assert.rejects(async () => {
-      memDb.create("KeyValue", "myMap");
+      memDB.create("KeyValue", "myMap");
     }, new Error("Name myMap is already in use"));
 
     // Raises error if the datastructure type is unrecognized
     assert.rejects(async () => {
-      memDb.create("Invalid", "myMap");
+      memDB.create("Invalid", "myMap");
     }, new Error("Unrecognized datastructure type Invalid"));
   });
 
-  it("executes commands", async () => {
-    const memDb = new MemDb();
+  it("executes commands", () => {
+    const memDB = new MemDB();
 
-    memDb.create("KeyValue", "myMap");
+    memDB.create("KeyValue", "myMap");
 
-    memDb.execute("myMap", "set", "myKey", "myValue");
+    memDB.execute("myMap", "set", "myKey", "myValue");
 
-    assert.strictEqual(await memDb.execute("myMap", "get", "myKey"), "myValue");
+    assert.strictEqual(memDB.execute("myMap", "get", "myKey"), "myValue");
 
     // Raises error if datastructure name is missing
-    assert.rejects(async () => {
-      memDb.execute("missing", "set", "myKey", "myValue");
+    assert.rejects(() => {
+      memDB.execute("missing", "set", "myKey", "myValue");
     }, new Error("Missing datastructure for missing"));
   });
 
-  it("prevents race conditions", async () => {
-    // Create a custom key value store with a slow async set and fast set
-    // operation
-    class SlowKeyValue {
-      constructor() {
-        this.map = new Map();
-      }
+  it("deletes", () => {
+    const memDB = new MemDB();
 
-      // Sets a value after a delay of 1s
-      async slowSet(key, value) {
-        return new Promise((resolve) =>
-          setTimeout(() => {
-            this.map.set(key, value);
-            resolve();
-          }, 200)
-        );
-      }
+    memDB.create("KeyValue", "myMap");
 
-      // Sets value immediately
-      fastSet(key, value) {
-        return this.map.set(key, value);
-      }
+    assert.strictEqual(memDB.dsLookup.get("myMap") instanceof KeyValue, true);
 
-      get(key, value) {
-        return this.map.get(key);
-      }
-    }
+    memDB.delete("myMap");
 
-    const memDb = new MemDb({
-      SlowKeyValue,
-    });
-
-    memDb.create("SlowKeyValue", "myKeyValue");
-
-    const slowSet = memDb.execute(
-      "myKeyValue",
-      "slowSet",
-      "myKey",
-      "slowValue"
-    );
-    const fastSet = memDb.execute(
-      "myKeyValue",
-      "fastSet",
-      "myKey",
-      "fastValue"
-    );
-
-    await Promise.all([slowSet, fastSet]);
-
-    // Without a mutex slowSet API call will overwrite what fastSet wrote. With
-    // a mutex the last write should win.
-    assert.strictEqual(
-      await memDb.execute("myKeyValue", "get", "myKey"),
-      "fastValue"
-    );
+    assert.strictEqual(memDB.dsLookup.get("myMap"), undefined);
   });
 
-  it("deletes", async () => {
-    const memDb = new MemDb();
+  it("can rollback create", () => {
+    const memDB = new MemDB();
 
-    await memDb.create("KeyValue", "myMap");
+    let undo = memDB.undoCommand("create", "KeyValue", "myMap");
 
-    assert.strictEqual(memDb.dsLookup.get("myMap") instanceof KeyValue, true);
+    memDB.create("KeyValue", "myMap");
 
-    await memDb.delete("myMap");
+    assert.strictEqual(memDB.dsLookup.get("myMap") instanceof KeyValue, true);
 
-    assert.strictEqual(memDb.dsLookup.get("myMap"), undefined);
+    // Undoes the myMap creation
+    undo.execute();
+
+    assert.strictEqual(memDB.dsLookup.get("myMap"), undefined);
+  });
+
+  it("can rollback delete", () => {
+    const memDB = new MemDB();
+
+    // Create a map and insert a value
+    memDB.create("KeyValue", "myMap");
+    memDB.execute("myMap", "set", "myKey", "myValue");
+    assert.strictEqual(memDB.execute("myMap", "get", "myKey"), "myValue");
+
+    // Capture undo command
+    const undo = memDB.undoCommand("delete", "myMap");
+
+    // Delete the map
+    memDB.delete("myMap");
+    assert.rejects(() => {
+      memDB.execute("myMap", "get", "myKey");
+    }, new Error("Missing datastructure for myMap"));
+
+    // Execute rollback
+    undo.execute();
+
+    // Verify rollback recovered the map's original values
+    assert.strictEqual(memDB.execute("myMap", "get", "myKey"), "myValue");
+  });
+
+  it("can rollback execute", () => {
+    const memDB = new MemDB();
+
+    memDB.create("SortedSet", "mySortedSet");
+    memDB.execute("mySortedSet", "set", "001", "A");
+    memDB.execute("mySortedSet", "set", "002", "B");
+    memDB.execute("mySortedSet", "set", "003", "C");
+
+    const undo = memDB.undoCommand(
+      "execute",
+      "mySortedSet",
+      "deleteByRange",
+      "000",
+      "100"
+    );
+
+    memDB.execute("mySortedSet", "deleteByRange", "000", "100");
+
+    assert.deepStrictEqual(
+      memDB.execute("mySortedSet", "getByRange", "000", "100"),
+      []
+    );
+
+    undo.execute();
+
+    assert.deepStrictEqual(
+      memDB.execute("mySortedSet", "getByRange", "000", "100"),
+      [
+        ["001", "A"],
+        ["002", "B"],
+        ["003", "C"],
+      ]
+    );
   });
 });
