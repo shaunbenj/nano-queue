@@ -23,7 +23,10 @@ describe("ScriptExecutor", () => {
     memDB.delete("myMap")
     error("Trigger rollback") -- should roll back all previous commands
     `;
-    await executor.execute(failure_script);
+
+    try {
+      await executor.execute(failure_script);
+    } catch (error) {}
 
     // Restores the database back to where it was
     assert.strictEqual(database.execute("myMap", "get", "myKey"), "myValue");

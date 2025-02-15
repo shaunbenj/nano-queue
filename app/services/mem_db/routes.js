@@ -4,10 +4,7 @@ import memDBApi from "./api.js";
 // NOTE: Wrap callbacks in arrow functions to preserve this
 export default function addRoutes(server) {
   // Memory database API routes.
-  server.add_route("GET", "/api/get", (req, res, params) => {
-    memDBApi.getKey(req, res, params);
-  });
-  server.add_route("POST", "/api/set", (req, res, params) => {
-    memDBApi.setKey(req, res, params);
+  server.add_route("POST", "/api/execute", async (req, res, params) => {
+    memDBApi.executeScript(req, res, params);
   });
 }
