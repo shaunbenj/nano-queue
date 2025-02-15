@@ -57,6 +57,8 @@ export default class ScriptExecutor {
       try {
         const result = this.executor.execute(script);
 
+        console.log(`result ${result}`);
+
         return result;
       } catch (error) {
         console.log(`Error while running script: ${error}`);
@@ -67,6 +69,11 @@ export default class ScriptExecutor {
           undoCommand.execute();
         }
         console.log("Rolled back successfully");
+
+        // Re-throw the error
+        throw new Error(
+          `Error while executing script ${error.message}. Rolled back successfully`
+        );
       } finally {
         // Reset undoStack
         this.databaseWrapper.undoStack = [];
