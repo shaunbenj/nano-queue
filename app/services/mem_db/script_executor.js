@@ -52,6 +52,12 @@ export default class ScriptExecutor {
     // the db instance
     this.executor.registerGlobal("memDB", this.dbProxy);
 
+    // Register JSON to serialize / deserialize JSON strings
+    this.executor.registerGlobal("JSON", {
+      parse: (str) => JSON.parse(str),
+      stringify: (obj) => JSON.stringify(obj),
+    });
+
     // Lock executor to prevent multiple scripts from running at the same time
     return this.mutex.runExclusive(async () => {
       try {

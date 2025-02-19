@@ -1,7 +1,11 @@
 import BaseServer from "../../../lib/base_server.js";
+import "dotenv/config";
+import addRoutes from "./routes.js";
 
 const server = new BaseServer();
 
-server.listen(3010, () => {
-  console.log("Queue service listening on 3010");
+addRoutes(server);
+
+server.listen(process.env.QUEUE_PORT, () => {
+  console.log(`Queue service listening on ${process.env.QUEUE_PORT}`);
 });
