@@ -42,6 +42,19 @@ class QueueApi {
       errorResponse(res, error.message);
     }
   }
+
+  async deleteItem(req, res, params) {
+    const queueName = req.parsedBody.queueName;
+    const id = req.parsedBody.id;
+
+    try {
+      const data = await this.queueService.deleteItem(queueName, id);
+
+      jsonResponse(res, { data: data });
+    } catch (error) {
+      errorResponse(res, error.message);
+    }
+  }
 }
 
 const queueAPI = new QueueApi();

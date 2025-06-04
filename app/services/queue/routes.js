@@ -14,4 +14,8 @@ export default function addRoutes(server) {
   server.add_route("POST", "/popItem", async (req, res, params) => {
     queueAPI.popItem(req, res, params);
   });
+
+  server.add_route("POST", "/deleteItem", async (req, res, params) => {
+    queueAPI.deleteItem(req, res, params);
+  });
 }

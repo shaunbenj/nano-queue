@@ -35,7 +35,14 @@ export default class ScriptExecutor {
 
             target.undoStack.push(undo);
 
-            return database[prop].apply(database, args);
+            // Wasmoon has a bug where it can't handle null value's so we escape
+            // it to a string here
+            const val = database[prop].apply(database, args);
+            if (val === null || val === undefined) {
+              return "null";
+            } else {
+              return val;
+            }
           };
         }
 
@@ -52,6 +59,11 @@ export default class ScriptExecutor {
     // the db instance
     this.executor.registerGlobal("memDB", this.dbProxy);
 
+    // Register console as a logger
+    this.executor.registerGlobal("Logger", {
+      log: (str) => console.log(str),
+    });
+
     // Register JSON to serialize / deserialize JSON strings
     this.executor.registerGlobal("JSON", {
       parse: (str) => JSON.parse(str),
@@ -63,7 +75,12 @@ export default class ScriptExecutor {
       try {
         const result = this.executor.execute(script);
 
-        console.log(`result ${result}`);
+        // Handle buggy wasmoon behavior
+        if (result == "null") {
+          return null;
+        }
+
+        // console.log(`Script execution result ${result}`);
 
         return result;
       } catch (error) {
