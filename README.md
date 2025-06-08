@@ -13,7 +13,6 @@ Example usage:
 ![image](https://github.com/user-attachments/assets/9a88a06f-2185-4d9d-9c6f-7510b7ee452c)
 6. Once you have processed the item you can delete the item from the queue
 ![image](https://github.com/user-attachments/assets/b1885a63-0a55-44df-867a-33e5dac7e949)
-7. Attempting to pop again will not return any items
 ![image](https://github.com/user-attachments/assets/c195a1a5-5da2-4ef5-83c5-6f5ca2bf7429)
 
 # MemDB
