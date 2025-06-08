@@ -14,7 +14,7 @@ class RetryWorker {
     const queue = Queue.fromJSON(serializedQueue);
     this.queues.push(queue);
 
-    console.log(`Retry worker regsiter queue ${queue.name}`);
+    console.log(`Retry worker regsitered queue ${queue.name}`);
   }
 
   sleep(seconds) {
@@ -82,23 +82,3 @@ parentPort.on("message", (task) => {
 });
 
 await worker.run();
-/*
-    for serializedItem in serializedItems do
-
-      local item = JSON.parse(serializedItem)
-
-      item.retries = item.retries + 1
-
-      if item.retries >= ${queue.maxRetries} then
-        Logger.log("Item " .. item.id .. " has reached max retries. Moving to DLQ.")
-
-        memDB.execute("${
-          queue.deadLetterQueue
-        }", "leftPush", JSON.stringify(item))
-      else
-        Logger.log("Retrying Item " .. item.id)
-
-        memDB.execute("${queue.name}", "leftPush", JSON.stringify(item))
-      end
-    end
-*/
