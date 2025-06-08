@@ -11,7 +11,8 @@ Example usage:
 ![image](https://github.com/user-attachments/assets/7b2966fc-5dfc-4ec3-af50-819c514aa584)
 5. Once 30s has passed the [retry worker](https://github.com/shaunbenj/nano-queue/blob/main/app/services/queue/retry_worker.js) will move the item back onto the queue
 ![image](https://github.com/user-attachments/assets/9a88a06f-2185-4d9d-9c6f-7510b7ee452c)
-6. Once you have processed the item you can delete the item from the queue
+6. After the popping the item again you can then delete the item from the queue. Note attempting to delete the item while it is on the queue will fail.
+
 ![image](https://github.com/user-attachments/assets/b1885a63-0a55-44df-867a-33e5dac7e949)
 ![image](https://github.com/user-attachments/assets/c195a1a5-5da2-4ef5-83c5-6f5ca2bf7429)
 
